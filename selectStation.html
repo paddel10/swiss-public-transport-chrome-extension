@@ -11,8 +11,9 @@
   <script>
   $(function () {
     var station = '008501120';
+    var refreshDelay = 60000;
     var notifyFrom = moment().set('hour', 17).set('minute', 0);
-    var notifyTo = moment().set('hour', 17).set('minute', 40);
+    var notifyTo = moment().set('hour', 19).set('minute', 40);
     var notifyDelta = 3;
     function refresh() {
         var now = moment();
@@ -23,7 +24,8 @@
                     var prognosis, departure, delay;
                     var line = '<tr>';
                     departure = moment(this.stop.departure);
-                    if (now.subtract(notifyDelta, 'minutes').format('HH:mm') === departure.format('HH.mm')) {
+                    console.info('notify: ' + moment().add(notifyDelta, 'minutes').format('HH:mm') + 'departure: ' + departure.format('HH:mm'));
+                    if (moment().add(notifyDelta, 'minutes').format('HH:mm') === departure.format('HH:mm')) {
                       line = '<tr class="now">';
                     }
                     line += '<td>';
@@ -42,6 +44,8 @@
         } else {
           console.info("not yet: " + now.format('HH:mm'));
         }
+        // schedule a repeat
+        setTimeout(refresh, refreshDelay);
     }
     $('#station').autocomplete({
         source: function (request, response) {
@@ -60,7 +64,6 @@
             refresh();
         }
     });
-    setInterval(refresh, 60000);
     refresh();
 });
   </script>
@@ -117,9 +120,9 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th align="left">Zeit</th>
+                        <th align="left">Time</th>
                         <th>&nbsp;</th>
-                        <th align="left">Nach</th>
+                        <th align="left">Destination</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
