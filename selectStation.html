@@ -46,14 +46,18 @@
     }
     $('#station').autocomplete({
         source: function (request, response) {
-            $.get('http://transport.opendata.ch/v1/locations', {query: request.term, type: 'station'}, function(data) {
-                response($.map(data.stations, function(station) {
-                    return {
-                        label: station.name,
-                        station: station
-                    }
-                }));
-            }, 'json');
+            $.get('http://transport.opendata.ch/v1/locations',
+                {query: request.term, type: 'station'},
+                function(data) {
+                    response($.map(data.stations, function(station) {
+                        return {
+                            label: station.name,
+                            station: station
+                        }
+                    }));
+                },
+                'json'
+            );
         },
         select: function (event, ui) {
             station = ui.item.station.id;
@@ -124,7 +128,8 @@
                 <tbody></tbody>
             </table>
           </article>
-    </div>
+        </div>
+      </div>
   </div>
 </body>
 </html>
