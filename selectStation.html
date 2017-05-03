@@ -24,7 +24,6 @@
                     var prognosis, departure, delay;
                     var line = '<tr>';
                     departure = moment(this.stop.departure);
-                    console.info('notify: ' + moment().add(notifyDelta, 'minutes').format('HH:mm') + 'departure: ' + departure.format('HH:mm'));
                     if (moment().add(notifyDelta, 'minutes').format('HH:mm') === departure.format('HH:mm')) {
                       line = '<tr class="now">';
                     }
@@ -41,8 +40,6 @@
                     $('#stationboard tbody').append(line);
                 });
             }, 'json');
-        } else {
-          console.info("not yet: " + now.format('HH:mm'));
         }
         // schedule a repeat
         setTimeout(refresh, refreshDelay);
@@ -60,7 +57,6 @@
         },
         select: function (event, ui) {
             station = ui.item.station.id;
-            console.info("station.id = " + station);
             refresh();
         }
     });
