@@ -23,3 +23,24 @@ h2 {
   padding: 3px 5px;
   font-size: 100%
 }
+
+
+/* station ui */
+
+.ui-widget,
+.ui-widget input {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+.ui-autocomplete {
+    text-align: left;
+}
+strong {
+    color: #d10505;
+}
+.column {
+    float: right;
+}
+.media {
+    padding-top: 30px;
+}
