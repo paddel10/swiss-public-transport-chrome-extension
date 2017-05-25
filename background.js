@@ -1,47 +1,55 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-/*
-  Displays a notification with the current time. Requires "notifications"
-  permission in the manifest file (or calling
-  "Notification.requestPermission" beforehand).
-*/
-
-function show() {
-    var time = /(..)(:..)/.exec(new Date());     // The prettyprinted time.
-    var hour = time[1] % 12 || 12;               // The prettyprinted hour.
-    var period = time[1] < 12 ? 'a.m.' : 'p.m.'; // The period of the day.
-    new Notification(hour + time[2] + ' ' + period, {
+function show(from, to, departure, delay) {
+    var notifyFrom = moment(calcStrFromMin(localStorage.notifyFrom), 'HH:mm');
+    if (delay) {
+        delay = ' (delayed ' + delay + ' minutes)';
+    } else {
+        delay = '';
+    }
+    new Notification(departure.format('HH:mm'), {
       icon: '48.png',
-      body: 'Time to make the toast.'
+      body: from + ' to ' + to + '. Your ride is leaving ' + moment().to(departure) + delay
     });
 }
 
-function refresh() {
+var refreshDelay = 60000;
 
+function refreshTransportData() {
+    var now = moment();
+    var notifyFrom = moment(calcStrFromMin(localStorage.notifyFrom), 'HH:mm');
+    var notifyTo = moment(calcStrFromMin(localStorage.notifyTo), 'HH:mm');
+    if (localStorage.station_id && now.isSameOrAfter(notifyFrom) && now.isSameOrBefore(notifyTo)) {
+        $.get('http://transport.opendata.ch/v1/stationboard', {id: localStorage.station_id, limit: 15}, function(data) {
+            $(data.stationboard).each(function () {
+                var prognosis, departure, delay;
+                departure = moment(this.stop.departure);
+                if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm')) {
+                    return;
+                }
+                if (this.stop.prognosis.departure) {
+                    prognosis = moment(this.stop.prognosis.departure);
+                    delay = (prognosis.valueOf() - departure.valueOf()) / 60000;
+                } else {
+                    // departure.format('HH:mm');
+                }
+                show(this.name, this.to, departure, delay);
+            });
+        }, 'json');
+    }
+    // schedule a repeat
+    setTimeout(refreshTransportData, refreshDelay);
 }
 
 // Conditionally initialize the options.
 if (!localStorage.isInitialized) {
-    localStorage.isActivated = true;   // The display activation.
-    localStorage.frequency = 1;        // The display frequency, in minutes.
-    localStorage.isInitialized = true; // The option initialization.
+    localStorage.station_name = '';
+    localStorage.station_id = 0;
+    localStorage.notifyFrom = 0;
+    localStorage.notifyTo = 1400;
+    localStorage.notifyDelta = 0;
+    localStorage.isInitialized = true;
 }
 
 // Test for notification support.
 if (window.Notification) {
-    // While activated, show notifications at the display frequency.
-    if (JSON.parse(localStorage.isActivated)) { show(); }
-
-    var interval = 0; // The display interval, in minutes.
-
-    setInterval(function() {
-        interval++;
-
-        if (JSON.parse(localStorage.isActivated) &&localStorage.frequency <= interval) {
-          show();
-          interval = 0;
-        }
-    }, 60000);
+    refreshTransportData();
 }

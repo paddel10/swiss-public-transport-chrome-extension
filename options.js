@@ -6,86 +6,13 @@
   Grays out or [whatever the opposite of graying out is called] the option
   field.
 */
-var station;
-var refreshDelay = 60000;
-var notifyFrom = moment().set('hour', 17).set('minute', 0);
-var notifyTo = moment().set('hour', 19).set('minute', 40);
-var notifyDelta = 3;
-
-function ghost(isDeactivated) {
-    options.style.color = isDeactivated ? 'graytext' : 'black';
-                                                // The label color.
-    options.frequency.disabled = isDeactivated; // The control manipulability.
-}
-
-function saveStationToStorage(obj) {
-    // chrome.storage.local.set({ "phasersTo": "awesome" }, function(){
-    chrome.storage.local.set(obj, function(){
-        //  Data's been saved boys and girls, go on home
-    });
-}
-
-function getStationFromStorage(key) {
-    // chrome.storage.local.get(/* String or Array */["phasersTo"], function(items){
-    chrome.storage.local.get(/* String or Array */[ key ], function(items){
-        //  items = [ { "phasersTo": "awesome" } ]
-        station = items.station.station_id;
-        $('#station').val(items.station.station_name);
-        console.log("getStationFromStorage() " + JSON.stringify(items));
-    });
-}
-
-function refreshTransportData() {
-    var now = moment();
-    if (station && now.isSameOrAfter(notifyFrom) && now.isSameOrBefore(notifyTo)) {
-        $.get('http://transport.opendata.ch/v1/stationboard', {id: station, limit: 15}, function(data) {
-            $('#stationboard tbody').empty();
-            $(data.stationboard).each(function () {
-                var prognosis, departure, delay;
-                var line = '<tr>';
-                departure = moment(this.stop.departure);
-                if (moment().add(notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm')) {
-                    return;
-                }
-                line += '<td>';
-                if (this.stop.prognosis.departure) {
-                    prognosis = moment(this.stop.prognosis.departure);
-                    delay = (prognosis.valueOf() - departure.valueOf()) / 60000;
-                    line += departure.format('HH:mm') + ' <strong>+' + delay + ' min</strong>';
-                } else {
-                    line += departure.format('HH:mm');
-                }
-                line += '</td><td>' + this.name + '</td><td>' + this.to + '</td></tr>';
-                $('#stationboard tbody').append(line);
-            });
-        }, 'json');
-    }
-    // schedule a repeat
-    setTimeout(refresh, refreshDelay);
-}
-
-window.addEventListener('load', function() {
-  // Initialize the option controls.
-    options.isActivated.checked = JSON.parse(localStorage.isActivated);
-                                           // The display activation.
-    options.frequency.value = localStorage.frequency;
-                                           // The display frequency, in minutes.
-
-    if (!options.isActivated.checked) { ghost(true); }
-
-    // Set the display activation and frequency.
-    options.isActivated.onchange = function() {
-        localStorage.isActivated = options.isActivated.checked;
-        ghost(!options.isActivated.checked);
-    };
-
-    options.frequency.onchange = function() {
-        localStorage.frequency = options.frequency.value;
-    };
-});
 
 $(document).ready(function() {
-    getStationFromStorage('station');
+    $('#station').val(localStorage.station_name);
+    $('#notifyFrom').val(calcStrFromMin(localStorage.notifyFrom));
+    $('#notifyTo').val(calcStrFromMin(localStorage.notifyTo));
+    $('#notifyDelta').val(localStorage.notifyDelta);
+
     $('#station').autocomplete({
         source: function (request, response) {
             $.get('http://transport.opendata.ch/v1/locations',
@@ -102,12 +29,28 @@ $(document).ready(function() {
             );
         },
         select: function (event, ui) {
-            station = ui.item.station.id;
-            saveStationToStorage({ 'station' : {
-              'station_name': ui.item.station.name,
-              'station_id': station
-            }});
-            //refresh();
+            localStorage.station_name = ui.item.station.name;
+            localStorage.station_id = station
         }
     });
+
+    $("#notifyDelta").on('keyup keydown change', function() {
+        localStorage.notifyDelta = $(this).val();
+    });
+    
+    $( "#slider-range" ).slider({
+        range: true,
+        min: 0,
+        max: 1440,
+        step: 15,
+        values: [ localStorage.notifyFrom, localStorage.notifyTo ],
+        slide: function(event, ui) {
+            localStorage.notifyFrom = ui.values[0];
+            localStorage.notifyTo = ui.values[1];
+            var notifyFrom = calcStrFromMin(ui.values[0]);
+            var notifyTo = calcStrFromMin(ui.values[1]);
+            $('#notifyFrom').val(notifyFrom);
+            $('#notifyTo').val(notifyTo);
+        }
+		});
 });

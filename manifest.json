@@ -8,7 +8,7 @@
     "notifications","storage"
   ],
   "options_page": "options.html",
-  "background": { "scripts": ["background.js"] },
+  "background": { "scripts": ["utils.js", "thirdparty/jquery-3.2.1.min.js", "thirdparty/moment.js", "background.js"] },
   "manifest_version": 2,
 
   // crbug.com/134315

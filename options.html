@@ -23,6 +23,7 @@
     <script src="thirdparty/jquery-ui.min.js"></script>
     <script src="thirdparty/moment.js"></script>
     <title>Swiss Public Transport</title>
+    <script src="utils.js"></script>
     <script src="options.js"></script>
   </head>
   <body>
@@ -34,14 +35,23 @@
               <img src="64.png" alt="Swiss Public Transport Departure">
               Swiss Public Transport Departure
             </h1>
-            <h2>Options</h2>
             <div class="ui-widget station">
-              <label for="station">Station: </label>
+              <h3>Station</h3>
+              <label for="station">Choose your departing station: </label>
               <input class="form-control" id="station" value="" placeholder="Search for a Station" />
             </div>
             <div class="ui-widget">
-              <label for="notifyFrom">Notification: </label>
-              <input type="time" name="notifyFrom" id="notifyFrom">
+              <h3>Notification time range</h3>
+              <label for="notifyFrom">Choose the time range in which you'd like to be notified: </label>
+              <input type="time" readonly name="notifyFrom" id="notifyFrom">
+              -
+              <input type="time" readonly name="notifyTo" id="notifyTo">
+            </div>
+            <div id="slider-range"></div>
+            <div class="ui-widget">
+            <h3>Notification</h3>
+              <label for="notifyDelta">Choose the number of minutes before the departure you'd like to be notified: </label>
+              <input type="number" name="notifyDelta" id="notifyDelta" min="0" max="60">
             </div>
             <div class="media">
             </div>
