@@ -7,7 +7,7 @@ function show(from, to, departure, delay) {
     }
     new Notification(departure.format('HH:mm'), {
       icon: '48.png',
-      body: from + ' to ' + to + '. Your ride is leaving ' + moment().to(departure) + delay
+      body: from + ' to ' + to + ' is leaving ' + moment().to(departure) + delay
     });
 }
 
