@@ -30,7 +30,7 @@ $(document).ready(function() {
         },
         select: function (event, ui) {
             localStorage.station_name = ui.item.station.name;
-            localStorage.station_id = station
+            localStorage.station_id = ui.item.station.id;
         }
     });
 
