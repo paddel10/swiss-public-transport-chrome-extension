@@ -1,0 +1,18 @@
+# Color for labels
+
+## Zürich - ZVV
+
+| Transport | Nr | Color|
+| ----------|:--:|:----:|
+| Tram | 3 | #00892F |
+| Tram | 4 | #11296F |
+| Tram | 5 | #734522 |
+| Tram | 6 | #CA7D3C |
+| Tram | 7 | #000000 |
+| Tram | 8 | #8AB51F |
+| Tram | 9 | #11296F |
+| Tram | 10 | #E12472 |
+| Tram | 11 | #00892F |
+| Tram | 13 | #FFC100 |
+| Tram | 14 | #008DC5 |
+| Tram | 17 | #8E224D |

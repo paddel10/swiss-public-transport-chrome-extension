@@ -5,8 +5,24 @@ function show(from, to, departure, delay) {
     } else {
         delay = '';
     }
+    var imagesPath = 'images/labels/';
+    switch (localStorage.location) {
+        case 'Zürich-ZVV':
+            imagesPath = imagesPath + 'zvv/';
+            break;
+        case 'Basel-BVB':
+        case 'Bern-Bern-Mobil':
+        default:
+            imagesPath = '';
+            break;
+    }
+    var icon = '48.png';
+    if (from.startsWith('T')) {
+        icon = imagesPath + from.replace(' ', '') + '.png';
+    }
+
     new Notification(departure.format('HH:mm'), {
-      icon: '48.png',
+      icon: icon,
       body: from + ' to ' + to + ' is leaving ' + moment().to(departure) + delay
     });
 }
@@ -45,7 +61,7 @@ if (!localStorage.isInitialized) {
     localStorage.station_id = 0;
     localStorage.notifyFrom = 0;
     localStorage.notifyTo = 1400;
-    localStorage.notifyDelta = 0;
+    localStorage.notifyDelta = 5;
     localStorage.isInitialized = true;
 }
 

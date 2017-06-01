@@ -12,6 +12,7 @@ $(document).ready(function() {
     $('#notifyFrom').val(calcStrFromMin(localStorage.notifyFrom));
     $('#notifyTo').val(calcStrFromMin(localStorage.notifyTo));
     $('#notifyDelta').val(localStorage.notifyDelta);
+    $('#location').val(localStorage.location);
 
     $('#station').autocomplete({
         source: function (request, response) {
@@ -37,7 +38,11 @@ $(document).ready(function() {
     $("#notifyDelta").on('keyup keydown change', function() {
         localStorage.notifyDelta = $(this).val();
     });
-    
+
+    $('#location').on('change', function() {
+        localStorage.location = this.value;
+    });
+
     $( "#slider-range" ).slider({
         range: true,
         min: 0,
