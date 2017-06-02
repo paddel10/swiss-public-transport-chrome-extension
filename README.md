@@ -5,20 +5,20 @@ The user pre-selects the departure station, the time range in which the notifica
 
 The extension is also available in the Google Chrome Webstore: https://chrome.google.com/webstore/detail/swiss-public-transport-de/himldllpdlkcdemakpcogfkoighmfpgi
 
-# Localization
+## Localization
 (TBD) The user may select the location of the station to get localized notifications such as displaying the line number instead of the generic icon.
 
-# Limitations - things to do
+## Limitations - things to do
 - if location is selected not every transport has it's own label
 - no transportation filter yet
 - limit notification to one direction
 - limit notification to one line
 
-# Links
+## Links
 - Notification: https://developer.chrome.com/extensions/samples
 - Stationboard: https://transport.opendata.ch/examples/stationboard.html
 
 
-# License
+## License
 
 MIT license, see [LICENSE](LICENSE)
