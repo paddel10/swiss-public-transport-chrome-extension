@@ -12,7 +12,9 @@ $(document).ready(function() {
     $('#notifyFrom').val(calcStrFromMin(localStorage.notifyFrom));
     $('#notifyTo').val(calcStrFromMin(localStorage.notifyTo));
     $('#notifyDelta').val(localStorage.notifyDelta);
-    $('#location').val(localStorage.location);
+    $('#location').val(localStorage.location ? localStorage.location : 'none');
+
+    populateDestinationsList();
 
     $('#station').autocomplete({
         source: function (request, response) {
@@ -32,6 +34,7 @@ $(document).ready(function() {
         select: function (event, ui) {
             localStorage.station_name = ui.item.station.name;
             localStorage.station_id = ui.item.station.id;
+            clearDestinations();
         }
     });
 
@@ -43,7 +46,35 @@ $(document).ready(function() {
         localStorage.location = this.value;
     });
 
-    $( "#slider-range" ).slider({
+    $('#reloadAllDest').on('click', function() {
+        populateDestinationsList();
+    });
+
+    $('#selectAllDest').on('click', function() {
+        $('[id^=dest]').prop('checked', true);
+        var destinations = loadDestinationsFromStorage();
+        destinations = $.map(destinations, function (value) {
+            value.isActive = true;
+            return value;
+        });
+        saveDestinationsToStorage(destinations);
+    });
+
+    $('#deselectAllDest').on('click', function() {
+        $('[id^=dest]').prop('checked', false);
+        var destinations = loadDestinationsFromStorage();
+        destinations = $.map(destinations, function (value) {
+            value.isActive = false;
+            return value;
+        });
+        saveDestinationsToStorage(destinations);
+    });
+
+    $('#clearAllDest').on('click', function() {
+        clearDestinations();
+    });
+
+    $("#slider-range").slider({
         range: true,
         min: 0,
         max: 1440,
@@ -57,5 +88,78 @@ $(document).ready(function() {
             $('#notifyFrom').val(notifyFrom);
             $('#notifyTo').val(notifyTo);
         }
-		});
+    });
+
+    function cmpDestinations(a, b) {
+        if (a.name < b.name)
+            return -1;
+        if (a.name > b.name)
+            return 1;
+        if (a.to < b.to)
+            return -1;
+        if (a.to > b.to)
+            return 1;
+        return 0;
+    }
+
+    function clearDestinations() {
+        $('#destinationsCheckB').empty();
+        $('#noDest').show();
+        saveDestinationsToStorage([]);
+    }
+
+    function populateDestinationsList() {
+        $('#destinationsCheckB').empty();
+        $('#destinationsCheckB').hide();
+        $('#noDest').hide();
+        var destinations = loadDestinationsFromStorage();
+        if (destinations.length) {
+            $('#destinationsCheckB').show();
+            $.each(destinations, function(index, value) {
+                addDestination(value.name, value.to, value.isActive);
+            });
+        } else {
+            $('#noDest').show();
+        }
+    }
+
+    function addDestination(name, to, isActive) {
+        var container = $('#destinationsCheckB');
+        var inputs = container.find('input');
+        var id = 0;
+        if (inputs) {
+            id = inputs.length + 1;
+        }
+        id = 'dest' + id;
+        var div = $('<div />', { style: 'display:table;width:auto;display: inline-block;' });
+        var li = $('<li />', { class: 'checkbox' });
+
+        $('<img />', { style: 'pull-left; margin-right:10px;', src: getLabelPath(name) }).appendTo(li);
+        $('<input />', { style: 'padding-left:5px;margin:0;vertical-align:middle;position: relative;', type: 'checkbox', id: id, value: name, to: to, checked: isActive }).appendTo(li);
+        $('<label />', { 'for': 'dest' + id, text: name + ' to ' + to, style: 'display:inline-block;' }).appendTo(li);
+        div.appendTo(li);
+        li.appendTo(container);
+        $('#' + id).on('click', function() {
+            updateDestination($(this).attr('value'), $(this).attr('to'), this.checked);
+        });
+    }
+
+    function updateDestination(name, to, isActive) {
+        var destinations = loadDestinationsFromStorage();
+        destinations = $.map(destinations, function (value) {
+            if (value.to === to && value.name === name) {
+                value.isActive = isActive;
+            }
+            return value;
+        });
+        saveDestinationsToStorage(destinations);
+    }
+
+    function loadDestinationsFromStorage() {
+        return JSON.parse(localStorage.destinations).sort(cmpDestinations);
+    }
+
+    function saveDestinationsToStorage(destinations) {
+        localStorage.destinations = JSON.stringify(destinations);
+    }
 });

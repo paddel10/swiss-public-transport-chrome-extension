@@ -5,21 +5,8 @@ function show(from, to, departure, delay) {
     } else {
         delay = '';
     }
-    var imagesPath = 'images/labels/';
-    switch (localStorage.location) {
-        case 'Zürich-ZVV':
-            imagesPath = imagesPath + 'zvv/';
-            break;
-        case 'Basel-BVB':
-        case 'Bern-Bern-Mobil':
-        default:
-            imagesPath = '';
-            break;
-    }
-    var icon = '48.png';
-    if (from.startsWith('T')) {
-        icon = imagesPath + from.replace(' ', '') + '.png';
-    }
+
+    var icon = getLabelPath(from);
 
     new Notification(departure.format('HH:mm'), {
       icon: icon,
@@ -34,11 +21,14 @@ function refreshTransportData() {
     var notifyFrom = moment(calcStrFromMin(localStorage.notifyFrom), 'HH:mm');
     var notifyTo = moment(calcStrFromMin(localStorage.notifyTo), 'HH:mm');
     if (localStorage.station_id && now.isSameOrAfter(notifyFrom) && now.isSameOrBefore(notifyTo)) {
-        $.get('http://transport.opendata.ch/v1/stationboard', {id: localStorage.station_id, limit: 15}, function(data) {
+        var datetime = moment().add(localStorage.notifyDelta, 'minutes').format('YYYY-MM-DD HH:mm');
+        $.get('http://transport.opendata.ch/v1/stationboard', {id: localStorage.station_id, datetime: datetime, limit: 15}, function(data) {
             $(data.stationboard).each(function () {
                 var prognosis, departure, delay;
                 departure = moment(this.stop.departure);
-                if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm')) {
+                var isActive = updateDestination(this.to, this.name);
+                if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm') ||
+                    isActive === false) {
                     return;
                 }
                 if (this.stop.prognosis.departure) {
@@ -55,6 +45,24 @@ function refreshTransportData() {
     setTimeout(refreshTransportData, refreshDelay);
 }
 
+function updateDestination(to, name) {
+    var found = false;
+    var isActive = false;
+    var destinations = JSON.parse(localStorage.destinations);
+    $.each(destinations, function(index, value) {
+       if (value.to === to && value.name === name) {
+           found = true;
+           isActive = value.isActive;
+           return false;
+       }
+    });
+    if (!found) {
+        isActive = true;
+        destinations.push({'to': to, 'isActive': isActive, 'name': name});
+    }
+    localStorage.destinations = JSON.stringify(destinations);
+    return isActive;
+}
 // Conditionally initialize the options.
 if (!localStorage.isInitialized) {
     localStorage.station_name = '';
@@ -65,6 +73,9 @@ if (!localStorage.isInitialized) {
     localStorage.isInitialized = true;
 }
 
+if (!localStorage.destinations) {
+    localStorage.destinations = JSON.stringify([]);
+}
 // Test for notification support.
 if (window.Notification) {
     refreshTransportData();

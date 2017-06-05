@@ -7,3 +7,22 @@ function calcStrFromMin(minutes) {
     if (minutes.toString().length == 1) minutes = '0' + minutes;  
     return hours + ':' + minutes;
 }
+
+function getLabelPath(name) {
+    var imagesPath = 'images/labels/';
+    switch (localStorage.location) {
+        case 'Zürich-ZVV':
+            imagesPath = imagesPath + 'zvv/';
+            break;
+        case 'Basel-BVB':
+        case 'Bern-Bern-Mobil':
+        default:
+            imagesPath = '';
+            break;
+    }
+    var icon = '48.png';
+    if (name.startsWith('T')) {
+        icon = imagesPath + name.replace(' ', '') + '.png';
+    }
+    return icon;
+}

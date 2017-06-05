@@ -47,6 +47,7 @@
               <h3>Your location</h3>
               <label for="location">Choose your location to display localized notifications: </label>
               <select class="format-control" id="location">
+                <option value="none">None</option>
                 <option value="Basel-BVB">Basel - BVB</option>
                 <option value="Bern-Bern-Mobil">Bern - Bern Mobil</option>
                 <option value="Zürich-ZVV">Zürich - ZVV</option>
@@ -68,6 +69,19 @@
               <input type="number" name="notifyDelta" id="notifyDelta" min="0" max="60">
             </div>
             <div class="media">
+            </div>
+
+            <div class="ui-widget" id="destinationsDiv">
+                <h3>Filter Destinations</h3>
+                Choose the destinations you'd like to be notified. The list is empty after installing the extension and after selecting a new departure station. It is updated every minute.
+
+                <div id="destCheckExp">
+                    <label for="destCheckExp">Destinations: </label>
+                    <button id="reloadAllDest">Reload from Storage</button>&nbsp;<button id="selectAllDest">Select All</button>&nbsp;<button id="deselectAllDest">De-select All</button>&nbsp;<button id="clearAllDest">Clear All</button>
+                </div>
+                <div id="noDest">There are currently no destinations available</div>
+                <div id="destinationsCheckB">
+                </div>
             </div>
 
           </article>
