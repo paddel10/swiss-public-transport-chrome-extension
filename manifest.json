@@ -3,7 +3,10 @@
   "version": "1.1.1",
   "description":
     "This extension alerts a user when a train, tram or bus departs from a station.",
-  "icons": {"16": "16.png", "48": "48.png", "128": "128.png"},
+  "icons": {"16": "images/16.png", "48": "images/48.png", "128": "images/128.png"},
+  "browser_action": {
+    "default_icon": "images/128.png"
+  },
   "permissions": [
     "notifications","storage"
   ],
@@ -12,6 +15,6 @@
   "manifest_version": 2,
 
   "web_accessible_resources": [
-    "48.png"
+    "images/48.png"
   ]
 }

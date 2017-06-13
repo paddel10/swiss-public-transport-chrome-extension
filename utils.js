@@ -20,7 +20,7 @@ function getLabelPath(name) {
             imagesPath = '';
             break;
     }
-    var icon = '48.png';
+    var icon = 'images/48.png';
     if (name.startsWith('T')) {
         icon = imagesPath + name.replace(' ', '') + '.png';
     }
