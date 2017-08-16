@@ -24,9 +24,10 @@ function refreshTransportData() {
         var datetime = moment().add(localStorage.notifyDelta, 'minutes').format('YYYY-MM-DD HH:mm');
         $.get('http://transport.opendata.ch/v1/stationboard', {id: localStorage.station_id, datetime: datetime, limit: 15}, function(data) {
             $(data.stationboard).each(function () {
-                var prognosis, departure, delay;
+                var prognosis, departure, delay, name;
                 departure = moment(this.stop.departure);
-                var isActive = updateDestination(this.to, this.name);
+                name = this.category + this.number;
+                var isActive = updateDestination(this.to, name);
                 if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm') ||
                     isActive === false) {
                     return;
@@ -37,7 +38,7 @@ function refreshTransportData() {
                 } else {
                     // departure.format('HH:mm');
                 }
-                show(this.name, this.to, departure, delay);
+                show(name, this.to, departure, delay);
             });
         }, 'json');
     }
