@@ -26,7 +26,10 @@ function refreshTransportData() {
             $(data.stationboard).each(function () {
                 var prognosis, departure, delay, name;
                 departure = moment(this.stop.departure);
-                name = this.category + this.number;
+                name = this.category;
+				if (!this.number.startsWith(name)) {
+					name += this.number;
+				}
                 var isActive = updateDestination(this.to, name);
                 if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm') ||
                     isActive === false) {
