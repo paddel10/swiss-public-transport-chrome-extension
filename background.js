@@ -84,3 +84,7 @@ if (!localStorage.destinations) {
 if (window.Notification) {
     refreshTransportData();
 }
+
+chrome.browserAction.onClicked.addListener(function(tab) {
+	chrome.tabs.create({ url: 'options.html' });
+});

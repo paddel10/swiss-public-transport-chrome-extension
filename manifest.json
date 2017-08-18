@@ -1,6 +1,6 @@
 {
   "name": "Swiss Public Transport Departure",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description":
     "This extension alerts a user when a train, tram or bus departs from a station.",
   "icons": {"16": "images/16.png", "48": "images/48.png", "128": "images/128.png"},
@@ -11,7 +11,14 @@
     "notifications","storage"
   ],
   "options_page": "options.html",
-  "background": { "scripts": ["utils.js", "thirdparty/jquery-3.2.1.min.js", "thirdparty/moment.js", "background.js"] },
+  "background": { 
+	"scripts": [
+		"utils.js",
+		"thirdparty/jquery-3.2.1.min.js",
+		"thirdparty/moment.js",
+		"background.js"
+		]
+  },
   "manifest_version": 2,
 
   "web_accessible_resources": [
