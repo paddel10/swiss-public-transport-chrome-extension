@@ -23,6 +23,7 @@
     <script src="thirdparty/jquery-ui.min.js"></script>
     <script src="thirdparty/moment.js"></script>
     <title>Swiss Public Transport</title>
+    <script src="globals.js"></script>
     <script src="utils.js"></script>
     <script src="options.js"></script>
   </head>
@@ -84,6 +85,22 @@
                 </div>
             </div>
 
+            <div class="ui-widget" id="departureDiv">
+                <h3>Next Departures</h3>
+                <table id="departureTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Time</th>
+                            <th>Delay</th>
+                            <th>Transport</th>
+                            <th>Destination</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+            </div>
           </article>
         </div>
       </div>

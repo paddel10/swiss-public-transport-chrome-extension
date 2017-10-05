@@ -16,6 +16,17 @@ $(document).ready(function() {
 
     populateDestinationsList();
 
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        switch (message.text) {
+            case UPDATE_DEPARTURES:
+                populateDestinationsList();
+                updateDepartures();
+                break;
+            default:
+                break;
+        }
+    });
+
     $('#station').autocomplete({
         source: function (request, response) {
             $.get('http://transport.opendata.ch/v1/locations',
@@ -35,6 +46,7 @@ $(document).ready(function() {
             localStorage.station_name = ui.item.station.name;
             localStorage.station_id = ui.item.station.id;
             clearDestinations();
+            chrome.runtime.sendMessage({text: GET_DEPARTURES});
         }
     });
 
@@ -44,6 +56,8 @@ $(document).ready(function() {
 
     $('#location').on('change', function() {
         localStorage.location = this.value;
+        populateDestinationsList();
+        updateDepartures();
     });
 
     $('#reloadAllDest').on('click', function() {
@@ -103,6 +117,7 @@ $(document).ready(function() {
     }
 
     function clearDestinations() {
+        $('#departureTable > tbody').html('');
         $('#destinationsCheckB').empty();
         $('#noDest').show();
         saveDestinationsToStorage([]);
@@ -112,9 +127,11 @@ $(document).ready(function() {
         $('#destinationsCheckB').empty();
         $('#destinationsCheckB').hide();
         $('#noDest').hide();
+        $('#departureDiv').hide();
         var destinations = loadDestinationsFromStorage();
         if (destinations.length) {
             $('#destinationsCheckB').show();
+            $('#departureDiv').show();
             $.each(destinations, function(index, value) {
                 addDestination(value.name, value.to, value.isActive);
             });
@@ -153,6 +170,36 @@ $(document).ready(function() {
             return value;
         });
         saveDestinationsToStorage(destinations);
+    }
+
+    function updateDepartures() {
+        var departures = JSON.parse(localStorage.departures);
+        $('#departureTable > tbody').html('');
+        $.each(departures, function(index, departure) {
+            var name = getLabelPath(departure.name);
+            var delay = '';
+            if (departure.delay) {
+                delay = ' (' + departure.delay + ')';
+            }
+            $('#departureTable > tbody').append('' +
+                    '<tr>' +
+                        '<td>' +
+                        '   <img src="' + name + '">' +
+                        '</td>' +
+                        '<td>' +
+                            departure.time +
+                        '</td>' +
+                        '<td>' +
+                            delay +
+                        '</td>' +
+                        '<td>' +
+                                departure.name +
+                        '</td>' +
+                        '<td>' +
+                            departure.to +
+                        '</td>' +
+                    '</tr>');
+        });
     }
 
     function loadDestinationsFromStorage() {
