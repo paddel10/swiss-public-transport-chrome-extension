@@ -20,7 +20,6 @@ $(document).ready(function() {
         switch (message.text) {
             case UPDATE_DEPARTURES:
                 populateDestinationsList();
-                updateDepartures();
                 break;
             default:
                 break;
@@ -57,7 +56,6 @@ $(document).ready(function() {
     $('#location').on('change', function() {
         localStorage.location = this.value;
         populateDestinationsList();
-        updateDepartures();
     });
 
     $('#reloadAllDest').on('click', function() {
@@ -170,36 +168,6 @@ $(document).ready(function() {
             return value;
         });
         saveDestinationsToStorage(destinations);
-    }
-
-    function updateDepartures() {
-        var departures = JSON.parse(localStorage.departures);
-        $('#departureTable > tbody').html('');
-        $.each(departures, function(index, departure) {
-            var name = getLabelPath(departure.name);
-            var delay = '';
-            if (departure.delay) {
-                delay = ' (' + departure.delay + ')';
-            }
-            $('#departureTable > tbody').append('' +
-                    '<tr>' +
-                        '<td>' +
-                        '   <img src="' + name + '">' +
-                        '</td>' +
-                        '<td>' +
-                            departure.time +
-                        '</td>' +
-                        '<td>' +
-                            delay +
-                        '</td>' +
-                        '<td>' +
-                                departure.name +
-                        '</td>' +
-                        '<td>' +
-                            departure.to +
-                        '</td>' +
-                    '</tr>');
-        });
     }
 
     function loadDestinationsFromStorage() {

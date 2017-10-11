@@ -88,7 +88,9 @@ if (!localStorage.destinations) {
 if (!localStorage.departures) {
     localStorage.departures = JSON.stringify([]);
 }
-
+if (!localStorage.isFiltered) {
+    localStorage.isFiltered = false;
+}
 // Test for notification support.
 if (window.Notification) {
     refreshTransportData();
