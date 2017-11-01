@@ -63,7 +63,7 @@ $(document).ready(function() {
     });
 
     $('#selectAllDest').on('click', function() {
-        $('[id^=dest]').prop('checked', true);
+        $('[id^=destinationCheck]').prop('checked', true);
         var destinations = loadDestinationsFromStorage();
         destinations = $.map(destinations, function (value) {
             value.isActive = true;
@@ -73,7 +73,7 @@ $(document).ready(function() {
     });
 
     $('#deselectAllDest').on('click', function() {
-        $('[id^=dest]').prop('checked', false);
+        $('[id^=destinationCheck]').prop('checked', false);
         var destinations = loadDestinationsFromStorage();
         destinations = $.map(destinations, function (value) {
             value.isActive = false;
@@ -101,18 +101,6 @@ $(document).ready(function() {
             $('#notifyTo').val(notifyTo);
         }
     });
-
-    function cmpDestinations(a, b) {
-        if (a.name < b.name)
-            return -1;
-        if (a.name > b.name)
-            return 1;
-        if (a.to < b.to)
-            return -1;
-        if (a.to > b.to)
-            return 1;
-        return 0;
-    }
 
     function clearDestinations() {
         $('#departureTable > tbody').html('');
@@ -145,13 +133,13 @@ $(document).ready(function() {
         if (inputs) {
             id = inputs.length + 1;
         }
-        id = 'dest' + id;
+        id = 'destinationCheck' + id;
         var div = $('<div />', { style: 'display:table;width:auto;display: inline-block;' });
         var li = $('<li />', { class: 'checkbox' });
 
         $('<img />', { style: 'pull-left; margin-right:10px;', src: getLabelPath(name) }).appendTo(li);
         $('<input />', { style: 'padding-left:5px;margin:0;vertical-align:middle;position: relative;', type: 'checkbox', id: id, value: name, to: to, checked: isActive }).appendTo(li);
-        $('<label />', { 'for': 'dest' + id, text: name + ' to ' + to, style: 'display:inline-block;' }).appendTo(li);
+        $('<label />', { 'for': 'destinationCheck' + id, text: name + ' to ' + to, style: 'display:inline-block;' }).appendTo(li);
         div.appendTo(li);
         li.appendTo(container);
         $('#' + id).on('click', function() {
@@ -168,13 +156,5 @@ $(document).ready(function() {
             return value;
         });
         saveDestinationsToStorage(destinations);
-    }
-
-    function loadDestinationsFromStorage() {
-        return JSON.parse(localStorage.destinations).sort(cmpDestinations);
-    }
-
-    function saveDestinationsToStorage(destinations) {
-        localStorage.destinations = JSON.stringify(destinations);
     }
 });
