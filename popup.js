@@ -39,14 +39,14 @@ $(document).ready(function() {
                         departure.to +
                         '</td>' +
                         '</tr>');
-                if (0 === departures.length) {
-                    $('#departureTable > tbody').append('' +
-                        '<tr><td>' +
-                        'currently no next departures' +
-                        '</td></tr>');
-                }
             }
         });
+        if ($('#departureTable > tbody').html() === '') {
+            $('#departureTable > tbody').append('' +
+                '<tr><td colspan="5">' +
+                'currently no departures' +
+                '</td></tr>');
+        }
     }
 
     function isDepartureActive(name, to) {
