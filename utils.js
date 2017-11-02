@@ -26,3 +26,40 @@ function getLabelPath(name) {
     }
     return icon;
 }
+
+function cmpDestinations(a, b) {
+    if (a.name < b.name)
+        return -1;
+    if (a.name > b.name)
+        return 1;
+    if (a.to < b.to)
+        return -1;
+    if (a.to > b.to)
+        return 1;
+    return 0;
+}
+
+function loadDestinationsFromStorage() {
+    return JSON.parse(localStorage.destinations).sort(cmpDestinations);
+}
+
+function saveDestinationsToStorage(destinations) {
+    localStorage.destinations = JSON.stringify(destinations);
+}
+
+function isDestinationActive(destinations, name, to) {
+    var result = $.grep(destinations, function(e) { return (e.name === name && e.to === to); });
+
+    if (result.length === 1) {
+        return result[0].isActive;
+    }
+    return false;
+}
+
+function getIsFiltered() {
+    return (localStorage.isFiltered === 'true');
+}
+
+function setIsFiltered(isFiltered) {
+    localStorage.isFiltered = isFiltered;
+}

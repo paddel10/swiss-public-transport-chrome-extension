@@ -24,6 +24,7 @@ function refreshTransportData() {
     if (localStorage.station_id && now.isSameOrAfter(notifyFrom) && now.isSameOrBefore(notifyTo)) {
         var datetime = moment().add(localStorage.notifyDelta, 'minutes').format('YYYY-MM-DD HH:mm');
         $.get('http://transport.opendata.ch/v1/stationboard', {id: localStorage.station_id, datetime: datetime, limit: 15}, function(data) {
+            var destinations = loadDestinationsFromStorage();
             $(data.stationboard).each(function () {
                 var prognosis, departure, delay, name;
                 departure = moment(this.stop.departure);
@@ -38,13 +39,14 @@ function refreshTransportData() {
                     // departure.format('HH:mm');
                 }
 				departures.push({'name': name, 'to': this.to, 'time': departure.format('HH:mm'), 'delay': delay});
-                var isActive = updateDestination(this.to, name);
-                if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') !== departure.format('HH:mm') ||
-                    isActive === false) {
-                    return;
+				destinations = setDestination(destinations, name, this.to);
+                var isActive = isDestinationActive(destinations, name, this.to);
+                if (moment().add(localStorage.notifyDelta, 'minutes').format('HH:mm') === departure.format('HH:mm') &&
+                    isActive === true) {
+                    show(name, this.to, departure, delay);
                 }
-                show(name, this.to, departure, delay);
             });
+            saveDestinationsToStorage(destinations);
             localStorage.departures = JSON.stringify(departures);
             chrome.runtime.sendMessage({'text': UPDATE_DEPARTURES});
         }, 'json');
@@ -53,23 +55,14 @@ function refreshTransportData() {
     setTimeout(refreshTransportData, refreshDelay);
 }
 
-function updateDestination(to, name) {
-    var found = false;
-    var isActive = false;
-    var destinations = JSON.parse(localStorage.destinations);
-    $.each(destinations, function(index, value) {
-       if (value.to === to && value.name === name) {
-           found = true;
-           isActive = value.isActive;
-           return false;
-       }
-    });
-    if (!found) {
-        isActive = true;
-        destinations.push({'to': to, 'isActive': isActive, 'name': name});
+function setDestination(destinations, name, to) {
+    var result = $.grep(destinations, function(e) { return (e.name === name && e.to === to); });
+
+    if (result.length === 0) {
+        destinations.push({'to': to, 'isActive': false, 'name': name});
     }
-    localStorage.destinations = JSON.stringify(destinations);
-    return isActive;
+    
+    return destinations;
 }
 
 // Conditionally initialize the options.
@@ -83,19 +76,20 @@ if (!localStorage.isInitialized) {
 }
 
 if (!localStorage.destinations) {
-    localStorage.destinations = JSON.stringify([]);
+    saveDestinationsToStorage([]);
 }
 if (!localStorage.departures) {
     localStorage.departures = JSON.stringify([]);
 }
-
+if (!localStorage.isFiltered) {
+    localStorage.isFiltered = false;
+}
 // Test for notification support.
 if (window.Notification) {
     refreshTransportData();
 }
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
-    console.log('message received: ' + gMessageMap[message.text]);
     switch (message.text) {
         case GET_DEPARTURES:
             refreshTransportData();
